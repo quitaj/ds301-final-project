@@ -21,10 +21,10 @@ library(dplyr)
 data2 <- data %>% select(-c(Country,Year))
 
 # Part 1: Regression model
-# Model Selection and Regularization
-# Best subset Selection (p<30)
-# Cross Validation -> LOOCV?
-# Regularization can yield better prediciton accuracy
-# Check for multicollinearity, non constant variance, non linearity
+#Model Selection and Regularization
+#Best subset Selection (p<30)
+#Cross Validation -> LOOCV?
+#Regularization can yield better prediciton accuracy
+#Check for multicollinearity, non constant variance, non linearity
 
 #Part 2: Classification Model
