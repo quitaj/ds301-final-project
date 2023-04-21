@@ -47,9 +47,18 @@ for(i in 1:19){
   pred = test.mat[,names(coef.m)]%*%coef.m 
   val.errors[i] = mean((test$Life.expectancy-pred)^2) 
   } 
+
+plot(val.errors)
 which.min(val.errors) 
 
 coef(best.train,12)
 
+summary(best.train)
+
+model = lm(Life.expectancy~.,data=data2)
+summary(model)
+
+model = lm(Life.expectancy~.-Hepatitis.B-Measles-Polio-Total.expenditure-GDP-Population-thinness..1.19.years,data=data2)
+summary(model)
 
 # Part 2: Classification Model
