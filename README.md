@@ -53,41 +53,40 @@ for(i in 1:19){
   val.errors[i] = mean((test$Life.expectancy-pred)^2) 
   } 
 
-plot(val.errors)
-which.min(val.errors) 
-
-coef(best.train,9)
-coef(best.train,12)
-
-pred12 = test.mat[,names(coef(best.train,id=12))]%*%coef(best.train,id=12)
-pred12[1]
-
-#TEST MSE = 13.5
-val.errors[12]
-sqrt(val.errors[12])
 best.train.sum = summary(best.train)
-
 p = rowSums(best.train.sum$which) #number of predictors + intercept in the model 
 rss = best.train.sum$rss
 adjr2 = best.train.sum$adjr2
 cp = best.train.sum$cp
 AIC = n*log(rss/n) + 2*(p)
 BIC = n*log(rss/n) + (p)*log(n)
-cbind(p,AIC,BIC,adjr2,cp,rss)
+cbind(p,rss,adjr2,AIC,BIC,cp, val.errors)
 
+plot(val.errors)
+which.min(val.errors)
 which.min(AIC)
 which.min(BIC)
 which.max(adjr2)
 which.min(cp)
 
-fit = lm(Life.expectancy ~ Status + Adult.Mortality + infant.deaths + Alcohol + percentage.expenditure + BMI + under.five.deaths + Diphtheria + HIV.AIDS + thinness.5.9.years + Income.composition.of.resources + Schooling ,train)
+coef(best.train,9)
+
+pred9 = test.mat[,names(coef(best.train,id=9))]%*%coef(best.train,id=9)
+pred9[1]
+
+#TEST MSE = 13.65
+val.errors[9]
+sqrt(val.errors[9])
+
+fit = lm(Life.expectancy ~ Adult.Mortality + infant.deaths + percentage.expenditure + BMI + under.five.deaths + Diphtheria + HIV.AIDS +  Income.composition.of.resources + Schooling ,train)
 summary(fit)
 
 library(car)
 vif(fit)
 #VIF for infant.deaths and under.five.deaths are very high. infant.deaths is removed to resolve multicollinearity
 
-fit2 = lm(Life.expectancy ~ Status + Adult.Mortality + Alcohol + percentage.expenditure + BMI + under.five.deaths + Diphtheria + HIV.AIDS + thinness.5.9.years + Income.composition.of.resources + Schooling, train)
+fit2 = lm(Life.expectancy ~ Adult.Mortality + percentage.expenditure + BMI + under.five.deaths + Diphtheria + HIV.AIDS +  Income.composition.of.resources + Schooling, train)
+summary(fit2)
 vif(fit2)
 
 par(mfrow=c(2,2))
@@ -95,6 +94,9 @@ plot(fit2)
 #residuals VS fitted values fairly random -> constant variance
 #scale-location plot also fairly randoma and linear
 
+pred = predict(fit2,newdata = test)
+MSE_test = mean((test$Life.expectancy - pred)^2)
+MSE_test
 
 # Part 2: Classification Model
 
