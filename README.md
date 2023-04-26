@@ -2,6 +2,7 @@
 
 data = read.csv('Life Expectancy Data.csv') 
 dim(data)
+summary(data)
 
 #Data cleaning 
 anyNA(data) 
@@ -18,13 +19,12 @@ length(unique(data$Country))
 data$Status = as.factor(data$Status)
 
 library(dplyr) 
-data2 <- data %>% select(-c(Country,Year))
+data2 <- data %>% select(-c(Country))
 summary(data2)
 
 # Part 1: Regression model
 
 #Model Selection 
-#Regularization can yield better prediciton accuracy 
 #Check for multicollinearity, non constant variance, non linearity
 
 #REGULAR MLR MODEL
@@ -39,8 +39,8 @@ n = dim(data2)[1]
 set.seed(10) 
 train_index = sample(1:n,n/2,rep=FALSE)
 
-train = data2[train_index,]
-test = data2[-train_index,]
+train = (data2$Year == 2014)
+test = (data2$Year == 2015)
 
 library(leaps) 
 best.train = regsubsets(Life.expectancy~.,data=train,nbest=1,nvmax=19)
