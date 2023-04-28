@@ -161,5 +161,65 @@ text(tree.data,pretty=0)
 
 # Part 2: Classification Model
 
-test
+test <- subset(test, select = -c(1, 2))
+train <- subset(train, select = -c(1, 2))
+data <- subset(data, select = -c(1, 2))
+
+### LDA
+library(MASS)
+
+lda.fit = lda(Status~.,data= train)
+
+lda.fit
+
+lda.pred = predict(lda.fit ,test)
+names(lda.pred)
+
+head(lda.pred$class)
+head(lda.pred$posterior)
+
+table(lda.pred$class,test$Status)
+mean(lda.pred$class!=test$Status) 
+mean(lda.pred$class==test$Status)
+
+### QDA
+
+qda.fit = qda(Status ~ .,data = train)
+
+qda.pred = predict(qda.fit,test)
+
+table(qda.pred$class,test$Status)
+
+mean(qda.pred$class==test$Status)
+
+### KNN
+
+library(ISLR2)
+
+data$Status <- as.numeric(as.factor(data$Status))
+test$Status <- as.numeric(as.factor(test$Status))
+train$Status <- as.numeric(as.factor(train$Status))
+
+standardized.data = scale(data[,-20])
+standardized.test = scale(test[,-20])
+standardized.train = scale(train[,-20])
+
+train.X = standardized.train
+test.X = standardized.test
+train.Y = train$Status
+test.Y = test$Status
+
+set.seed(1)
+library(class)
+knn.pred = knn(train.X,test.X,train.Y,k=1)
+head(knn.pred)
+
+table(knn.pred,test.Y)
+mean(test.Y!=knn.pred)
+
+###### How to choose K? ##########
+###### Cross-validation ##########
+
+
+
 
