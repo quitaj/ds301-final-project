@@ -20,6 +20,7 @@ sum(is.na(data1))
 data = na.omit(data1) #removed 50-60 observations from train and test set
 anyNA(data) 
 dim(data) 
+376-325
 
 #DATA SPLIT
 set.seed(1)
@@ -75,9 +76,9 @@ coef(best.train,14)
 pred4 = test.mat[,names(coef(best.train,id=4))]%*%coef(best.train,id=4)
 pred4[1]
 
-#TEST MSE = 9.590808
-val.errors[4]
-sqrt(val.errors[4])
+#TEST MSE = 9.313424
+val.errors[14]
+sqrt(val.errors[14])
 
 fit = lm(Life.expectancy ~ Adult.Mortality + HIV.AIDS +  Income.composition.of.resources + Total.expenditure, data)
 summary(fit)
