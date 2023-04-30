@@ -34,15 +34,10 @@ hist(data$Life.expectancy, main = "Life Expectancy", xlab = "Life Expectancy")
 hist(train$Life.expectancy, main = "Train Life Expectancy", xlab = "Life Expectancy")
 hist(test$Life.expectancy, main = "Test Life Expectancy", xlab = "Life Expectancy")
 
-# Part 1: Regression model
+# Part 1: Prediction model
 
 #Model Selection 
 #Check for multicollinearity, non constant variance, non linearity
-
-#REGULAR MLR MODEL
-#Significant F Statistic
-model = lm(Life.expectancy ~ .,data=data)
-summary(model)
 
 #BEST SUBSET SELECTION WITH CV
 n = dim(data)[1]
@@ -59,22 +54,10 @@ for(i in 1:17){
   val.errors[i] = mean((test$Life.expectancy-pred)^2) 
   } 
 
-best.train.sum = summary(best.train)
-p = rowSums(best.train.sum$which) #number of predictors + intercept in the model 
-rss = best.train.sum$rss
-adjr2 = best.train.sum$adjr2
-cp = best.train.sum$cp
-AIC = n*log(rss/n) + 2*(p)
-BIC = n*log(rss/n) + (p)*log(n)
-cbind(p,rss,adjr2,AIC,BIC,cp, val.errors)
-
 plot(val.errors)
 which.min(val.errors)
 
 coef(best.train,14)
-
-pred4 = test.mat[,names(coef(best.train,id=4))]%*%coef(best.train,id=4)
-pred4[1]
 
 #TEST MSE = 9.313424
 val.errors[14]
