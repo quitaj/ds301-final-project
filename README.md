@@ -54,7 +54,7 @@ for(i in 1:17){
   val.errors[i] = mean((test$Life.expectancy-pred)^2) 
   } 
 
-plot(val.errors)
+plot(val.errors,xlab = "Number of Predictors", ylab = "Test MSE")
 which.min(val.errors)
 
 coef(best.train,14)
@@ -63,7 +63,7 @@ coef(best.train,14)
 val.errors[14]
 sqrt(val.errors[14])
 
-fit = lm(Life.expectancy ~ Adult.Mortality + HIV.AIDS +  Income.composition.of.resources + Total.expenditure, data)
+fit = lm(Life.expectancy ~ Adult.Mortality + HIV.AIDS +  Income.composition.of.resources + Total.expenditure + Status + infant.deaths + Alcohol + percentage.expenditure + Hepatitis.B + under.five.deaths + Diphtheria + thinness..1.19.years + thinness.5.9.years + Schooling, data)
 summary(fit)
 
 par(mfrow=c(2,2))
