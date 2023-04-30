@@ -153,14 +153,41 @@ par(mfrow=c(2,2))
 plot(final)
 
 # Part 2: Classification Model
+# Part 2: Classification Model
 
 test <- subset(test, select = -c(1, 2))
 train <- subset(train, select = -c(1, 2))
 data <- subset(data, select = -c(1, 2))
 
-### Logistic Regression
 
-glm.fit = glm(Status~., data=train, family='binomial')
+### Logistic Regression
+library(MASS)
+library(leaps) 
+
+best.train = regsubsets(Status~.,data=train,nbest=1,nvmax=17)
+
+val.errors = rep(NA,17) 
+for(i in 1:17){ 
+  test.mat = model.matrix(Status~.,data=test)
+  coef.m = coef(best.train,id=i)
+  pred = test.mat[,names(coef.m)]%*%coef.m 
+  val.errors[i] = mean((test$Status-pred)^2) 
+} 
+
+summary(best.train)
+
+best.train.sum = summary(best.train)
+n = n = dim(train)[1]
+p = rowSums(best.train.sum$which) #number of predictors + intercept in the model 
+rss = best.train.sum$rss
+AIC = n*log(rss/n) + 2*(p)
+plot(AIC,type='b')
+
+coef(best.train,4)
+
+### Using Best Model 
+
+glm.fit = glm(Status~ Life.expectancy + Alcohol + BMI + Total.expenditure , data=train, family='binomial')
 
 summary(glm.fit)
 head(glm.fit$fitted.values)
@@ -175,18 +202,23 @@ glm.pred = as.factor(glm.pred)
 mean(test$Status!=glm.pred)
 
 glm.pred = rep('Developed',131)
-glm.pred[glm.prob > 0.0000005] ='Developing'
+glm.pred[glm.prob > 0.3] ='Developing'
 table(glm.pred,test$Status)
 glm.pred = as.factor(glm.pred)
 mean(test$Status!=glm.pred)
 
 ### LDA
-
+library(ggplot2)
 library(MASS)
+
+hist(data$Life.expectancy, main = "Life Expectancy")
+hist(data$Alcohol, main = "Alcohol")
+hist(data$BMI, main = "BMI")
+hist(data$Total.expenditure, main = "Total.expenditure")
 
 head(test$Status)
 
-lda.fit = lda(Status~.,data= train)
+lda.fit = lda(Status~Life.expectancy + Alcohol + BMI + Total.expenditure,data= train)
 
 lda.fit
 
@@ -203,11 +235,16 @@ table(lda.class,test$Status)
 mean(lda.class!=test$Status) 
 
 
-### QDA
 
-str(train)
+### QDA 
 
-qda.fit = qda(Status ~ .,data = data)
+qda.fit = qda(Status ~ Life.expectancy + Alcohol + BMI + Total.expenditure,data = data)
+
+qda.pred = predict(qda.fit,test)
+
+table(qda.pred$class,test$Status)
+
+mean(qda.pred$class!=test$Status)
 
 
 ### KNN
@@ -234,9 +271,9 @@ library(caret)
 
 set.seed(1)
 
-test = 1:163
+tests = 1:163
 
-data2 = data[-test,]
+data2 = data[-tests,]
 standardized.X2 = scale(data2[,-18])
 
 flds <- createFolds(data2$Status, k = 5, list = TRUE, returnTrain = FALSE)
@@ -270,7 +307,6 @@ head(knn.pred)
 
 table(knn.pred,test.Y)
 mean(test.Y!=knn.pred)
-
 
 
 
