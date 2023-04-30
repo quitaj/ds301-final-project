@@ -153,7 +153,6 @@ par(mfrow=c(2,2))
 plot(final)
 
 # Part 2: Classification Model
-# Part 2: Classification Model
 
 test <- subset(test, select = -c(1, 2))
 train <- subset(train, select = -c(1, 2))
