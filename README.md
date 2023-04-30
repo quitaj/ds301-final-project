@@ -149,37 +149,63 @@ test <- subset(test, select = -c(1, 2))
 train <- subset(train, select = -c(1, 2))
 data <- subset(data, select = -c(1, 2))
 
+### Logistic Regression
+
+glm.fit = glm(Status~., data=train, family='binomial')
+
+summary(glm.fit)
+head(glm.fit$fitted.values)
+head(data)
+
+glm.prob = predict(glm.fit,test,type='response') 
+
+glm.pred = rep('Developed',131)
+glm.pred[glm.prob > 0.5] ='Developing'
+table(glm.pred,test$Status)
+glm.pred = as.factor(glm.pred)
+mean(test$Status!=glm.pred)
+
+glm.pred = rep('Developed',131)
+glm.pred[glm.prob > 0.0000005] ='Developing'
+table(glm.pred,test$Status)
+glm.pred = as.factor(glm.pred)
+mean(test$Status!=glm.pred)
+
 ### LDA
+
 library(MASS)
+
+head(test$Status)
 
 lda.fit = lda(Status~.,data= train)
 
 lda.fit
 
 lda.pred = predict(lda.fit ,test)
-names(lda.pred)
 
-head(lda.pred$class)
-head(lda.pred$posterior)
 
 table(lda.pred$class,test$Status)
-mean(lda.pred$class!=test$Status) 
-mean(lda.pred$class==test$Status)
+mean(lda.pred$class!=test$Status)
+
+lda.class = rep('Developed', 131)
+lda.class[lda.pred$posterior[,2]>=0.025] = 'Developing'
+lda.class = as.factor(lda.class)
+table(lda.class,test$Status)
+mean(lda.class!=test$Status) 
+
 
 ### QDA
 
-qda.fit = qda(Status ~ .,data = train)
+str(train)
 
-qda.pred = predict(qda.fit,test)
+qda.fit = qda(Status ~ .,data = data)
 
-table(qda.pred$class,test$Status)
-
-mean(qda.pred$class==test$Status)
 
 ### KNN
 
-library(ISLR2)
+library(class)
 
+set.seed(2)
 data$Status <- as.numeric(as.factor(data$Status))
 test$Status <- as.numeric(as.factor(test$Status))
 train$Status <- as.numeric(as.factor(train$Status))
@@ -193,16 +219,48 @@ test.X = standardized.test
 train.Y = train$Status
 test.Y = test$Status
 
+### K - Selection Using k-fold CV
+
+library(caret)
+
 set.seed(1)
-library(class)
+
+test = 1:163
+
+data2 = data[-test,]
+standardized.X2 = scale(data2[,-18])
+
+flds <- createFolds(data2$Status, k = 5, list = TRUE, returnTrain = FALSE)
+names(flds)
+
+K= c(1,3,5,7,9,11,13,15,17,19,21)
+
+cv_error = matrix(NA, 5, 11)
+head(cv_error)
+
+for(j in 1:11){
+  k = K[j]
+  for(i in 1:5){
+    test_index = flds[[i]]
+    testX = standardized.X2[test_index,]
+    trainX = standardized.X2[-test_index,]
+    
+    trainY = data2$Status[-test_index]
+    testY = data2$Status[test_index]
+    
+    knn.pred = knn(trainX,testX,trainY,k=k)
+    cv_error[i,j] = mean(testY!=knn.pred)
+  }
+}
+
+print(cv_error)
+apply(cv_error,2,mean)
+
 knn.pred = knn(train.X,test.X,train.Y,k=1)
 head(knn.pred)
 
 table(knn.pred,test.Y)
 mean(test.Y!=knn.pred)
-
-###### How to choose K? ##########
-###### Cross-validation ##########
 
 
 
