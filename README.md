@@ -71,6 +71,7 @@ plot(fit)
 #residuals VS fitted values fairly random -> constant variance
 #scale-location plot also fairly randoma and linear
 
+
 #Shrinkage Methods
 library(glmnet)
 set.seed(1)
@@ -94,7 +95,7 @@ plot(cv.out)
 bestlambda = cv.out$lambda.min
 bestlambda
 
-#test MSE associated with the model is 12.392
+#test MSE associated with the model is 9.993828
 ridge.pred = predict(ridge.train,s=bestlambda,newx=x[test,])
 mean((ridge.pred-Y.test)^2)
 
@@ -102,7 +103,7 @@ coef(ridge_model)
 dim(coef(ridge_model)) 
 
 
-#trying the data on lasso, gives me a test MSE of 12.191.
+#trying the data on lasso, gives me a test MSE of 9.555846.
 
 cv.out.lasso = cv.glmnet(x[train,],Y[train],alpha = 1, lambda = grid) 
 plot(cv.out.lasso)
@@ -118,7 +119,7 @@ final.lasso = glmnet(x,Y,alpha=1,lambda=bestlambda2)
 coef(final.lasso)
 
 
-#Trying lasso with a different lambda grid, gives test mse of 11.8175.
+#Trying lasso with a different lambda grid, gives test mse of 9.556944.
 grid = 5^seq(5,-2,length=50)
 
 cv.out.lasso = cv.glmnet(x[train,],Y[train],alpha = 1, lambda = grid) 
@@ -142,6 +143,14 @@ tree.data = tree(Life.expectancy~.-Country,data=data, subset=train)
 summary(tree.data)
 plot(tree.data)
 text(tree.data,pretty=0)
+
+#Final Model
+
+final = lm(Life.expectancy ~ Adult.Mortality + HIV.AIDS +  Income.composition.of.resources + Total.expenditure + Status + percentage.expenditure + under.five.deaths + Diphtheria + thinness..1.19.years, data)
+summary(final)
+
+par(mfrow=c(2,2))
+plot(final)
 
 # Part 2: Classification Model
 
