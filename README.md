@@ -154,15 +154,29 @@ plot(final)
 
 # Part 2: Classification Model
 
+### Resetting Data
+set.seed(1)
+data = read.csv('C:/Users/njrowray/OneDrive - Iowa State University/Documents/DS301/DS301 Final/Life Expectancy Data.csv') 
+data1 <- data %>% filter(data$Year == 2013|data$Year == 2014)
+
+data1$Status = as.factor(data1$Status)
+data1$Country = as.factor(data1$Country)
+data1 <- data1 %>% select(-c("GDP","Population"))
+data = na.omit(data1)
+train = data%>% filter(Year == 2013)
+test = data%>% filter(Year == 2014)
+
 test <- subset(test, select = -c(1, 2))
 train <- subset(train, select = -c(1, 2))
 data <- subset(data, select = -c(1, 2))
+
 
 
 ### Logistic Regression
 library(MASS)
 library(leaps) 
 
+### Best Subset Selection w/ Cross Validation
 best.train = regsubsets(Status~.,data=train,nbest=1,nvmax=17)
 
 val.errors = rep(NA,17) 
@@ -184,7 +198,7 @@ plot(AIC,type='b')
 
 coef(best.train,4)
 
-### Using Best Model 
+### Fit Model
 
 glm.fit = glm(Status~ Life.expectancy + Alcohol + BMI + Total.expenditure , data=train, family='binomial')
 
@@ -193,6 +207,8 @@ head(glm.fit$fitted.values)
 head(data)
 
 glm.prob = predict(glm.fit,test,type='response') 
+
+### Matrix with .5 threshold and new at .3
 
 glm.pred = rep('Developed',131)
 glm.pred[glm.prob > 0.5] ='Developing'
@@ -210,6 +226,8 @@ mean(test$Status!=glm.pred)
 library(ggplot2)
 library(MASS)
 
+### Showing semi-normal distribution and small data set
+
 hist(data$Life.expectancy, main = "Life Expectancy")
 hist(data$Alcohol, main = "Alcohol")
 hist(data$BMI, main = "BMI")
@@ -217,18 +235,21 @@ hist(data$Total.expenditure, main = "Total.expenditure")
 
 head(test$Status)
 
+### Fit Model
+
 lda.fit = lda(Status~Life.expectancy + Alcohol + BMI + Total.expenditure,data= train)
 
 lda.fit
 
 lda.pred = predict(lda.fit ,test)
 
+### Matrix with .5 threshold and new at .3
 
 table(lda.pred$class,test$Status)
 mean(lda.pred$class!=test$Status)
 
 lda.class = rep('Developed', 131)
-lda.class[lda.pred$posterior[,2]>=0.025] = 'Developing'
+lda.class[lda.pred$posterior[,2]>=0.3] = 'Developing'
 lda.class = as.factor(lda.class)
 table(lda.class,test$Status)
 mean(lda.class!=test$Status) 
@@ -237,20 +258,36 @@ mean(lda.class!=test$Status)
 
 ### QDA 
 
+### Shows that variance is not the same - justifies why we used QDA after LDA
+
+var(data$Life.expectancy)
+var(data$Alcohol)
+var(data$BMI)
+var(data$Total.expenditure)
+
+### Fit the Model
+
 qda.fit = qda(Status ~ Life.expectancy + Alcohol + BMI + Total.expenditure,data = data)
 
+### Matrix with .5 threshold and new at .3
+
 qda.pred = predict(qda.fit,test)
-
 table(qda.pred$class,test$Status)
-
 mean(qda.pred$class!=test$Status)
+
+qda.class = rep('Developed', 131)
+qda.class[qda.pred$posterior[,2]>=0.3] = 'Developing'
+qda.class = as.factor(qda.class)
+table(qda.class,test$Status)
+mean(qda.class!=test$Status) 
 
 
 ### KNN
 
 library(class)
 
-set.seed(2)
+### Factor and standardize the data set
+
 data$Status <- as.numeric(as.factor(data$Status))
 test$Status <- as.numeric(as.factor(test$Status))
 train$Status <- as.numeric(as.factor(train$Status))
@@ -264,11 +301,9 @@ test.X = standardized.test
 train.Y = train$Status
 test.Y = test$Status
 
-### K - Selection Using k-fold CV
+### K - Selection Using 5 k-fold CV
 
 library(caret)
-
-set.seed(1)
 
 tests = 1:163
 
@@ -301,11 +336,12 @@ for(j in 1:11){
 print(cv_error)
 apply(cv_error,2,mean)
 
+### Matrix of results
+
 knn.pred = knn(train.X,test.X,train.Y,k=1)
 head(knn.pred)
 
 table(knn.pred,test.Y)
 mean(test.Y!=knn.pred)
-
 
 
