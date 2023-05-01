@@ -156,7 +156,7 @@ plot(final)
 
 ### Resetting Data
 set.seed(1)
-data = read.csv('C:/Users/njrowray/OneDrive - Iowa State University/Documents/DS301/DS301 Final/Life Expectancy Data.csv') 
+data = read.csv('Life Expectancy Data.csv') 
 data1 <- data %>% filter(data$Year == 2013|data$Year == 2014)
 
 data1$Status = as.factor(data1$Status)
