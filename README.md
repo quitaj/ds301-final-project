@@ -282,7 +282,7 @@ table(qda.class,test$Status)
 mean(qda.class!=test$Status) 
 
 
-### KNN
+## KNN
 
 library(class)
 
@@ -336,7 +336,7 @@ for(j in 1:11){
 print(cv_error)
 apply(cv_error,2,mean)
 
-### Matrix of results
+### Matrix of results - using best k
 
 knn.pred = knn(train.X,test.X,train.Y,k=1)
 head(knn.pred)
