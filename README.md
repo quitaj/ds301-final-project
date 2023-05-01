@@ -210,13 +210,13 @@ glm.prob = predict(glm.fit,test,type='response')
 
 ### Matrix with .5 threshold and new at .3
 
-glm.pred = rep('Developed',131)
+glm.pred = rep('Developed',163)
 glm.pred[glm.prob > 0.5] ='Developing'
 table(glm.pred,test$Status)
 glm.pred = as.factor(glm.pred)
 mean(test$Status!=glm.pred)
 
-glm.pred = rep('Developed',131)
+glm.pred = rep('Developed',163)
 glm.pred[glm.prob > 0.3] ='Developing'
 table(glm.pred,test$Status)
 glm.pred = as.factor(glm.pred)
@@ -248,7 +248,7 @@ lda.pred = predict(lda.fit ,test)
 table(lda.pred$class,test$Status)
 mean(lda.pred$class!=test$Status)
 
-lda.class = rep('Developed', 131)
+lda.class = rep('Developed', 163)
 lda.class[lda.pred$posterior[,2]>=0.3] = 'Developing'
 lda.class = as.factor(lda.class)
 table(lda.class,test$Status)
@@ -275,7 +275,7 @@ qda.pred = predict(qda.fit,test)
 table(qda.pred$class,test$Status)
 mean(qda.pred$class!=test$Status)
 
-qda.class = rep('Developed', 131)
+qda.class = rep('Developed', 163)
 qda.class[qda.pred$posterior[,2]>=0.3] = 'Developing'
 qda.class = as.factor(qda.class)
 table(qda.class,test$Status)
