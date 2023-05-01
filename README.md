@@ -176,7 +176,7 @@ data <- subset(data, select = -c(1, 2))
 library(MASS)
 library(leaps) 
 
-### Best Subset Selection w/ Cross Validation
+### w/ Cross Validation
 best.train = regsubsets(Status~.,data=train,nbest=1,nvmax=17)
 
 val.errors = rep(NA,17) 
