@@ -172,7 +172,7 @@ data <- subset(data, select = -c(1, 2))
 
 
 
-### Logistic Regression
+## Logistic Regression
 library(MASS)
 library(leaps) 
 
@@ -222,7 +222,7 @@ table(glm.pred,test$Status)
 glm.pred = as.factor(glm.pred)
 mean(test$Status!=glm.pred)
 
-### LDA
+## LDA
 library(ggplot2)
 library(MASS)
 
@@ -256,7 +256,7 @@ mean(lda.class!=test$Status)
 
 
 
-### QDA 
+## QDA 
 
 ### Shows that variance is not the same - justifies why we used QDA after LDA
 
